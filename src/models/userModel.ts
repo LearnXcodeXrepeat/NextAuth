@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: [true, "Please provide an username"],
+      required: [true, "Please provide a username"],
       unique: true,
     },
     email: {
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Please provide an password"],
+      required: [true, "Please provide a password"],
       unique: true,
     },
     isVerified: {
@@ -34,3 +34,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Check if the model already exists before creating a new one
+const User = mongoose.models.users || mongoose.model("Users", userSchema);
+
+export default User;
