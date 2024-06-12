@@ -19,12 +19,25 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
       });
     }
 
+    // ----------------ERROR--------------------
+    //======ENV VARIABLE NOT LOAD PROPERLY======
+    // ----------------ERROR--------------------
+
+    // var transport = nodemailer.createTransport({
+    //   host: "sandbox.smtp.mailtrap.io",
+    //   port: 2525,
+    //   auth: {
+    //     user: process.env.NODEMAILER_USER,
+    //     pass: process.env.NODEMAILER_PASS,
+    //   },
+    // });
+
     var transport = nodemailer.createTransport({
       host: "sandbox.smtp.mailtrap.io",
       port: 2525,
       auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS,
+        user: "c1dc8b4a6097c2",
+        pass: "6ff1c45242480a",
       },
     });
 
