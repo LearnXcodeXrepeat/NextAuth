@@ -14,7 +14,7 @@ export async function POST(request: NextRequest, res: NextResponse) {
 
     const user = await User.findOne({ email });
 
-    if (email) {
+    if (user) {
       return NextResponse.json(
         { error: "user already exists" },
         { status: 400 }
@@ -35,10 +35,11 @@ export async function POST(request: NextRequest, res: NextResponse) {
     console.log(savedUser);
 
     //send verification mail
+
     await sendEmail({ email, emailType: "VERIFY", userId: savedUser._id });
 
     return NextResponse.json({
-      message: "user register successfully",
+      message: "User created successfully",
       success: true,
       savedUser,
     });
