@@ -1,15 +1,30 @@
 import nodemailer from "nodemailer";
+import User from "@/models/userModel";
+import bcryptjs from "bcryptjs";
 
 export const sendEmail = async ({ email, emailType, userId }: any) => {
   try {
-    //*r configure mailer for usage
-    const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 465,
-      secure: true, // Use `true` for port 465, `false` for all other ports
+    //@r configure mailer for usage
+    const hashedToken = await bcryptjs.hash(userId.toString(), 10);
+
+    if (emailType === "VERIFY") {
+      await User.findByIdAndUpdate(userId, {
+        verifyToken: hashedToken,
+        verifyTokenExpiry: Date.now() + 360000,
+      });
+    } else if (emailType === "RESET") {
+      await User.findByIdAndUpdate(userId, {
+        forgotPasswordToken: hashedToken,
+        forgotPasswordTokenExpiry: Date.now() + 360000,
+      });
+    }
+
+    var transport = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
       auth: {
-        user: "REPLACE EMAIL",
-        pass: "REPLACE PASSWORD",
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS,
       },
     });
 
@@ -18,10 +33,19 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
       to: email, // list of receivers
       subject:
         emailType === "VERIFY" ? "verify your email" : "Reset Your Password", // Subject line
-      html: "<b>Hello world?</b>", // html body
+      html: `<p>Click <a href="${
+        process.env.DOMAIN
+      }/verifyemail?token=${hashedToken}">here</a> to ${
+        emailType === "VERIFY" ? "verify your email" : "reset your password"
+      }
+        or copy and paste the link below in your browser. <br> ${
+          process.env.DOMAIN
+        }/verifyemail?token=${hashedToken}
+        </p>`,
+      // @r RESET EMAIL Assignment
     };
 
-    const mailResponse = await transporter.sendMail(mailOptions);
+    const mailResponse = await transport.sendMail(mailOptions);
 
     return mailResponse;
   } catch (error: any) {
